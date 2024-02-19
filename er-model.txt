@@ -1,0 +1,4 @@
+Item (item_id [PK], user_id [FK], name, description, ends, started, first_bid, buy_price, currently, number_of_bids)
+User (user_id [PK], rating, location, country)
+ItemCategory ({item_id, category_name} [PK])
+Bid ({item_id, user_id, time} [PK], amount)
