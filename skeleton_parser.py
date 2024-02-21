@@ -99,8 +99,31 @@ def parseJson(json_file):
             seller = item['Seller']
             seller_id = seller['UserID']
             
+            escaped_seller_id = seller_id.strip().replace('"', '""')
+            trimmed_and_quoted_seller_id = f'"{escaped_seller_id}"'
+
+            escaped_location=item.get('Location', "NULL").strip().replace('"', '""')
+            trimmed_and_quoted_location=f'"{escaped_location}"'
+
+            escaped_country=item.get('Country', "NULL").strip().replace('"', '""')
+            trimmed_and_quoted_country=f'"{escaped_country}"'
+
+            escaped_item_name=item['Name'].strip().replace('"', '""')
+            trimmed_and_quoted_item_name=f'"{escaped_item_name}"'
+
+            if 'Description' in item:
+                if item['Description']:
+                        descrip = item.get('Description', "NULL")
+                else:
+                        descrip = "NULL"
+            else: 
+                descrip = "NULL"
+            
+            escaped_item_description=descrip.strip().replace('"', '""')
+            trimmed_and_quoted_item_description=f'"{escaped_item_description}"'
+
             # Users is a Set to prevent Duplicatse. ID,Rating, Country, Location. Adding Seller
-            users.add((seller_id, seller.get('Rating'), item.get('Location', "NULL"), item.get('Country', "NULL")))
+            users.add((trimmed_and_quoted_seller_id, seller.get('Rating'), trimmed_and_quoted_location, trimmed_and_quoted_country))
             
             if 'Buy_Price' in item:
                         buy_price = transformDollar(item['Buy_Price']) 
@@ -115,22 +138,32 @@ def parseJson(json_file):
                     bidder_id = bidder['UserID']
                     
                    
+                    escaped_bidder_id = bidder_id.strip().replace('"', '""')
+                    trimmed_and_quoted_bidder_id = f'"{escaped_bidder_id}"'
+
+                    escaped_bidder_location=bidder.get('Location', "NULL").strip().replace('"', '""')
+                    trimmed_and_quoted_bidder_location=f'"{escaped_bidder_location}"'
+
+                    escaped_bidder_country=bidder.get('Country', "NULL").strip().replace('"', '""')
+                    trimmed_and_quoted_bidder_country=f'"{escaped_bidder_country}"'
 
 
                     # Users is a Set to prevent Duplicatse. ID,Rating, Country, Location. Adding Bidder
-                    users.add((bidder_id, bidder.get('Rating'), bidder.get('Location', "NULL"), bidder.get('Country', "NULL")))
+                    users.add((trimmed_and_quoted_bidder_id, bidder.get('Rating'), trimmed_and_quoted_bidder_location, trimmed_and_quoted_country))
                     
                     
-                    bids_data.append((item_id, bidder_id, transformDttm(bid['Time']), transformDollar(bid['Amount'])))
+                    bids_data.append((item_id, trimmed_and_quoted_bidder_id, transformDttm(bid['Time']), transformDollar(bid['Amount'])))
 
-            items_data.append((item_id, seller_id, item['Name'], transformDollar(item['Currently']),
+            items_data.append((item_id, trimmed_and_quoted_seller_id, trimmed_and_quoted_item_name, transformDollar(item['Currently']),
                                buy_price, transformDollar(item['First_Bid']),
                                item['Number_of_Bids'], transformDttm(item['Started']), transformDttm(item['Ends']),
-                               item['Description']))
+                              trimmed_and_quoted_item_description))
             
             # item_id,category
             for category in item['Category']:
-                itemCategories_data.append((item_id, category))
+                escaped_category = category.strip().replace('"', '""')
+                trimmed_and_quoted_category = f'"{escaped_category}"'
+                itemCategories_data.append((item_id, trimmed_and_quoted_category))
             
             
             
@@ -156,7 +189,6 @@ def main(argv):
         if isJson(f):
             parseJson(f)
             print ("Success parsing ", f)
-            print(i+1) #Passing Arguments 1 by 1 instead of as multiple
 
     #Output
     write_output('items.dat', items_data)
