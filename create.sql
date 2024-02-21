@@ -3,8 +3,8 @@ drop table if exists User;
 CREATE TABLE User (
     user_id TEXT PRIMARY KEY,
     rating INTEGER,
-    country TEXT,
-    location TEXT
+    location TEXT,
+    country TEXT
 );
 
 drop table if exists Item;
