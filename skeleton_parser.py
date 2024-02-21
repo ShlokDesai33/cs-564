@@ -69,7 +69,9 @@ def transformDollar(money):
     return sub(r'[^\d.]', '', money)
 
 
-users, items_data, bids_data, itemCategories_data = set(), [], [], []
+users, items_data, bids_data = set(), [], []
+itemCategories_data =set()
+unique_user=set()
 
 def clear_output(filename):
     with open(filename, 'w') as f:
@@ -121,9 +123,13 @@ def parseJson(json_file):
             
             escaped_item_description=descrip.strip().replace('"', '""')
             trimmed_and_quoted_item_description=f'"{escaped_item_description}"'
+            
+            if trimmed_and_quoted_seller_id not in unique_user:
+                unique_user.add(trimmed_and_quoted_seller_id)
+                users.add((trimmed_and_quoted_seller_id, seller.get('Rating'), trimmed_and_quoted_location, trimmed_and_quoted_country))
 
             # Users is a Set to prevent Duplicatse. ID,Rating, Country, Location. Adding Seller
-            users.add((trimmed_and_quoted_seller_id, seller.get('Rating'), trimmed_and_quoted_location, trimmed_and_quoted_country))
+            
             
             if 'Buy_Price' in item:
                         buy_price = transformDollar(item['Buy_Price']) 
@@ -147,9 +153,10 @@ def parseJson(json_file):
                     escaped_bidder_country=bidder.get('Country', "NULL").strip().replace('"', '""')
                     trimmed_and_quoted_bidder_country=f'"{escaped_bidder_country}"'
 
-
+                    if trimmed_and_quoted_bidder_id not in unique_user:
+                        unique_user.add(trimmed_and_quoted_bidder_id)
+                        users.add((trimmed_and_quoted_bidder_id, bidder.get('Rating'), trimmed_and_quoted_bidder_location, trimmed_and_quoted_bidder_country))
                     # Users is a Set to prevent Duplicatse. ID,Rating, Country, Location. Adding Bidder
-                    users.add((trimmed_and_quoted_bidder_id, bidder.get('Rating'), trimmed_and_quoted_bidder_location, trimmed_and_quoted_country))
                     
                     
                     bids_data.append((item_id, trimmed_and_quoted_bidder_id, transformDttm(bid['Time']), transformDollar(bid['Amount'])))
@@ -163,7 +170,7 @@ def parseJson(json_file):
             for category in item['Category']:
                 escaped_category = category.strip().replace('"', '""')
                 trimmed_and_quoted_category = f'"{escaped_category}"'
-                itemCategories_data.append((item_id, trimmed_and_quoted_category))
+                itemCategories_data.add((item_id, trimmed_and_quoted_category))
             
             
             
@@ -179,10 +186,10 @@ def main(argv):
         print ('Usage: python skeleton_json_parser.py <path to json files>', file=sys.stderr)
         sys.exit(1)
     
-    clear_output('items.dat')
-    clear_output('bids.dat')
-    clear_output('itemCategories.dat')
-    clear_output('users.dat')
+    clear_output('Item.dat')
+    clear_output('Bid.dat')
+    clear_output('itemCategory.dat')
+    clear_output('User.dat')
     # loops over all .json files in the argument
     i =0 
     for f in argv[1:]:
@@ -191,10 +198,10 @@ def main(argv):
             print ("Success parsing ", f)
 
     #Output
-    write_output('items.dat', items_data)
-    write_output('bids.dat', bids_data)
-    write_output('itemCategories.dat', itemCategories_data)
-    write_output('users.dat', users)
+    write_output('Item.dat', items_data)
+    write_output('Bid.dat', bids_data)
+    write_output('itemCategory.dat', itemCategories_data)
+    write_output('User.dat', users)
 
 if __name__ == '__main__':
     main(sys.argv)
