@@ -30,7 +30,7 @@ CREATE TABLE Bid (
     user_id TEXT,
     time DATETIME,
     amount DOUBLE,
-    PRIMARY KEY (time, item_id, user_id),
+    PRIMARY KEY (time, item_id, user_id, amount),
     FOREIGN KEY (user_id) REFERENCES User(user_id),
     FOREIGN KEY (item_id) REFERENCES Item(item_id)
 );
