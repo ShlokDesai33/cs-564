@@ -2,6 +2,9 @@
 
 .import Item.dat Item
 update Item set buy_price = null where buy_price = "NULL";
+update Item set description = null where description = "NULL";
+
+
 
 .import User.dat User
 update User set location = null where location = "NULL";
